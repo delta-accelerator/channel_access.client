@@ -1,4 +1,4 @@
-Python Channel Access client library
-====================================
+Channel Access client library
+=============================
 
 

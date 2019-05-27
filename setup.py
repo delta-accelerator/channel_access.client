@@ -15,31 +15,14 @@ elif sys.platform.startswith('linux'):
     libsrc = 'Linux'
     compiler = 'gcc'
 
-epics_inc = os.path.join(os.environ['EPICS_BASE'], 'include')
-epics_lib = os.path.join(os.environ['EPICS_BASE'], 'lib', os.getenv('EPICS_HOST_ARCH'))
+epics_base = os.environ['EPICS_BASE']
+epics_host_arch = os.environ['EPICS_HOST_ARCH']
+epics_inc = os.path.join(epics_base, 'include')
+epics_lib = os.path.join(epics_base, 'lib', epics_host_arch)
 
-compiler_args = ['-Wall', '-std=c++14']
 
-
-
-ca_extension = Extension('ca_client.ca',
-    language = 'c++',
-    sources = list(map(lambda s: os.path.join('src/ca_client/ca', s), [
-        'ca.cpp'
-    ])),
-    include_dirs = [
-        'src/ca_client/ca',
-        epics_inc,
-        os.path.join(epics_inc, 'os', libsrc),
-        os.path.join(epics_inc, 'compiler', compiler),
-    ],
-    library_dirs = [ epics_lib ],
-    runtime_library_dirs = [ epics_lib ],
-    extra_compile_args = compiler_args,
-    libraries = ['ca']
-)
-
-cac_extension = Extension('ca_client.cac',
+cac_path = 'src/channel_access/client/cac'
+cac_extension = Extension('channel_access.client.cac',
     language = 'c++',
     sources = list(map(lambda s: os.path.join('src/ca_client/cac', s), [
         'cac.cpp',
@@ -54,13 +37,13 @@ cac_extension = Extension('ca_client.cac',
     ],
     library_dirs = [ epics_lib ],
     runtime_library_dirs = [ epics_lib ],
-    extra_compile_args = compiler_args,
+    extra_compile_args = ['-Wall', '-std=c++11'],
     libraries=['Com', 'ca']
 )
 
 
 setup(
-    name = 'ca_client',
+    name = 'channel_access.client',
     description = 'Channel Access client library',
     long_description = '',
     license='MIT',
@@ -75,7 +58,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Scientific/Engineering'
     ],
-    keywords = 'epics ca',
+    keywords = 'epics ca channel_access',
     packages = find_packages('src'),
     package_dir = { '': 'src' },
     ext_modules = [ ca_extension, cac_extension ],

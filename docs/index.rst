@@ -7,6 +7,5 @@ API Reference
 
 .. toctree::
 
-    ca_client.rst
-    ca_client.ca.rst
-    ca_client.cac.rst
+    client.rst
+    client.cac.rst
