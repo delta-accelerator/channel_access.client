@@ -35,6 +35,38 @@ class EventData(object):
         return result
 
 
+class HandlerSet(object):
+    """ Thread-safe set of handler functions.
+
+    Allows handler to be added and removed while iterating. The changes
+    are defered until the next iteration.
+    """
+    def __init__(self):
+        self._added_lock = threading.Lock()
+        self._added = set()
+        self._removed_lock = threading.Lock()
+        self._removed = set()
+        self._active = set()
+
+    def add(self, handler):
+        with self._added_lock:
+            self._added.add(handler)
+
+    def remove(self, handler):
+        with self._removed_lock:
+            self._removed.add(handler)
+
+    def run(self, *args, **kwargs):
+        with self._added_lock, self._removed_lock:
+            self._active |= self._added
+            self._added.clear()
+            self._active -= self._removed
+            self._removed.clear()
+        for handler in self._active:
+            handler(*args, **kwargs)
+
+
+
 class InitData(enum.Enum):
     """ Data to initialize when a PV connects. """
     NONE = 0
@@ -109,12 +141,13 @@ class PV(object):
         self._connect_value = EventData(False)
         self._get_value = EventData()
         self._put_value = EventData()
+        self._subscribed = False
 
         self._data = {}
         self._data_lock = threading.Lock()
 
-        self._connection_handlers = set()
-        self._monitor_handlers = set()
+        self._connection_handlers = HandlerSet()
+        self._monitor_handlers = HandlerSet()
 
         self._pv = cac.PV(name)
         self._pv.connection_handler = self._connection_handler
@@ -175,8 +208,7 @@ class PV(object):
                 self.subscribe()
             if self._auto_monitor or self._auto_initialize != InitData.NONE:
                 cac.flush_io()
-        for handler in self._connection_handlers:
-            handler(self, connected)
+        self._connection_handlers.run(self, connected)
 
     def _put_handler(self, succeeded):
         self._put_value.set(succeeded)
@@ -186,15 +218,13 @@ class PV(object):
         self._get_value.set(values)
         with self._data_lock:
             self._data.update(values)
-        for handler in self._monitor_handlers:
-            handler(self, values)
+        self._monitor_handlers.run(self, values)
 
     def _monitor_handler(self, values):
         values = self._decode(values)
         with self._data_lock:
             self._data.update(values)
-        for handler in self._monitor_handlers:
-            handler(self, values)
+        self._monitor_handlers.run(self, values)
 
     def add_connection_handler(self, handler):
         """
@@ -225,7 +255,7 @@ class PV(object):
         Arguments:
             handler (callable): The same object used in :meth:`add_connection_handler`.
         """
-        self._connection_handlers.discard(handler)
+        self._connection_handlers.remove(handler)
 
     def add_monitor_handler(self, handler):
         """
@@ -256,7 +286,7 @@ class PV(object):
         Arguments:
             handler (callable): The same object used in :meth:`add_monitor_handler`.
         """
-        self._monitor_handlers.discard(handler)
+        self._monitor_handlers.remove(handler)
 
     def connect(self, block=True):
         """
@@ -339,12 +369,14 @@ class PV(object):
         if count is None:
             count = self.count
 
-        self._pv.subscribe(trigger, count, control, as_string);
+        self._pv.subscribe(trigger, count, control, as_string)
+        self._subscribed = True
 
     def unsubscribe(self):
         """
         Remove the channel access subscription.
         """
+        self._subscribed = False
         self._pv.unsubscribe()
 
     def put(self, value, block=True):
@@ -491,6 +523,13 @@ class PV(object):
         bool: Wether this PV is connected or not.
         """
         return self._pv.is_connected()
+
+    @property
+    def monitored(self):
+        """
+        bool: Wether this PV is monitored by a :fun:`subscribe` call.
+        """
+        return self._subscribed
 
     @property
     def is_enum(self):
