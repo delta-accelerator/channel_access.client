@@ -1,6 +1,6 @@
 import os
 import sys
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, PEP420PackageFinder, Extension
 
 
 
@@ -24,13 +24,13 @@ epics_lib = os.path.join(epics_base, 'lib', epics_host_arch)
 cac_path = 'src/channel_access/client/cac'
 cac_extension = Extension('channel_access.client.cac',
     language = 'c++',
-    sources = list(map(lambda s: os.path.join('src/ca_client/cac', s), [
+    sources = list(map(lambda s: os.path.join(cac_path, s), [
         'cac.cpp',
         'pv.cpp',
         'convert.cpp'
     ])),
     include_dirs = [
-        'src/ca_client/cac',
+        cac_path,
         epics_inc,
         os.path.join(epics_inc, 'os', libsrc),
         os.path.join(epics_inc, 'compiler', compiler),
@@ -59,9 +59,9 @@ setup(
         'Topic :: Scientific/Engineering'
     ],
     keywords = 'epics ca channel_access',
-    packages = find_packages('src'),
+    packages = PEP420PackageFinder.find('src'),
     package_dir = { '': 'src' },
-    ext_modules = [ ca_extension, cac_extension ],
+    ext_modules = [ cac_extension ],
     python_requires = '>= 3.4',
     setup_requires = [ 'setuptools_scm' ],
     install_requires = [],

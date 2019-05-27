@@ -176,11 +176,11 @@ Low level wrapper module over the libca interface.
 )");
 PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
-    "ca_client.cac",  /* name of module */
-    cac__doc__,       /* module documentation, may be NULL */
-    -1,               /* size of per-interpreter state of the module,
-                         or -1 if the module keeps state in global variables. */
-    methods,          /* methods */
+    "channel_access.client.cac",  /* name of module */
+    cac__doc__,                   /* module documentation, may be NULL */
+    -1,                           /* size of per-interpreter state of the module,
+                                     or -1 if the module keeps state in global variables. */
+    methods,                      /* methods */
 };
 
 
@@ -189,7 +189,7 @@ This exception is raised when a channel access functions returns an error.
 )");
 PyObject* add_exception(PyObject* module)
 {
-    PyObject* exception = PyErr_NewExceptionWithDoc("ca_client.cac.CaException", ca_exception__doc__, PyExc_RuntimeError, nullptr);
+    PyObject* exception = PyErr_NewExceptionWithDoc("channel_access.client.cac.CaException", ca_exception__doc__, PyExc_RuntimeError, nullptr);
     if (not exception) return nullptr;
 
     Py_INCREF(exception);
@@ -220,7 +220,7 @@ PyMODINIT_FUNC PyInit_cac(void)
     if (not cac::ca_exception) goto error;
 
 
-    ca_module = PyImport_ImportModule("ca_client.ca");
+    ca_module = PyImport_ImportModule("channel_access.common");
     if (not ca_module) goto error;
 
     cac::flag_access_rights = PyObject_GetAttrString(ca_module, "AccessRights");

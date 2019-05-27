@@ -6,9 +6,8 @@ import threading
 from datetime import datetime
 import enum
 
+import channel_access.common as ca
 from . import cac
-
-from .ca import Status, Severity, AccessRights, Events, Type
 from .cac import CaException
 
 
@@ -173,7 +172,7 @@ class PV(object):
     def __del__(self):
         try:
             self.disconnect()
-        except CaException:
+        except cac.CaException:
             pass
 
     def _decode(self, values):
@@ -190,8 +189,7 @@ class PV(object):
                 result['value'] = result['value'].decode(self._encoding)
 
         if 'timestamp' in result:
-            ts = result['timestamp']
-            result['timestamp'] = datetime.utcfromtimestamp(ca.EPICS_EPOCH + ts[0] + ts[1] * 1E-9)
+            result['timestamp'] = ca.epics_to_datetime(result['timestamp'])
 
         return result
 
@@ -347,7 +345,7 @@ class PV(object):
         if not connected:
             raise RuntimeError("Could not ensure connection")
 
-    def subscribe(self, trigger = Events.VALUE | Events.ALARM , count=None, control=False, as_string=False):
+    def subscribe(self, trigger = ca.Events.VALUE | ca.Events.ALARM , count=None, control=False, as_string=False):
         """
         Create a channel access subscription.
 
@@ -527,7 +525,7 @@ class PV(object):
     @property
     def monitored(self):
         """
-        bool: Wether this PV is monitored by a :fun:`subscribe` call.
+        bool: Wether this PV is monitored by a :func:`subscribe` call.
         """
         return self._subscribed
 
@@ -536,7 +534,7 @@ class PV(object):
         """
         bool: Wether this PV is of enumeration type.
         """
-        return self.type == Type.ENUM
+        return self.type == ca.Type.ENUM
 
     @property
     def data(self):
