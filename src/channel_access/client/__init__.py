@@ -38,38 +38,6 @@ class _EventData(object):
         return result
 
 
-class HandlerSet(object):
-    """ Thread-safe set of handler functions.
-
-    Allows handler to be added and removed while iterating. The changes
-    are defered until the next iteration.
-    """
-    def __init__(self):
-        self._added_lock = threading.Lock()
-        self._added = set()
-        self._removed_lock = threading.Lock()
-        self._removed = set()
-        self._active = set()
-
-    def add(self, handler):
-        with self._added_lock:
-            self._added.add(handler)
-
-    def remove(self, handler):
-        with self._removed_lock:
-            self._removed.add(handler)
-
-    def run(self, *args, **kwargs):
-        with self._added_lock, self._removed_lock:
-            self._active |= self._added
-            self._added.clear()
-            self._active -= self._removed
-            self._removed.clear()
-        for handler in self._active:
-            handler(*args, **kwargs)
-
-
-
 class InitData(enum.Enum):
     """ Data to initialize when a PV connects. """
     NONE = 0
@@ -148,12 +116,12 @@ class PV(object):
                 If ``False`` :meth:`connect()` must be called to use
                 any channel access methods.
 
-                If this is a callable, add it as a connection handler and
+                If this is a callable, set it as the connection handler and
                 automatically call ``connect(block=False)`` after creating the PV.
             monitor (bool|callable):
                 If ``True`` automatically subscribe after :meth:`connect` is called.
 
-                If this is a callable, add it as a monitor handler and
+                If this is a callable, set it as the monitor handler and
                 automatically subscribe after :meth:`connect` is called.
             initialize (:class:`InitData`):
                 If ``InitData.DATA`` automatically call ``get(block=False)``
@@ -181,8 +149,8 @@ class PV(object):
         self._data = {}
         self._data_lock = threading.Lock()
 
-        self._connection_handlers = HandlerSet()
-        self._monitor_handlers = HandlerSet()
+        self._user_connection_handler = None
+        self._user_monitor_handler = None
 
         self._pv = cac.PV(name)
         self._pv.connection_handler = self._connection_handler
@@ -191,10 +159,10 @@ class PV(object):
         self._pv.monitor_handler = self._monitor_handler
 
         if connect and not isinstance(connect, bool):
-            self.add_connection_handler(connect)
+            self._user_connection_handler = connect
 
         if monitor and not isinstance(monitor, bool):
-            self.add_monitor_handler(monitor)
+            self._user_monitor_handler = monitor
 
         if connect:
             self.connect(block=False)
@@ -242,7 +210,8 @@ class PV(object):
                 self.subscribe()
             if self._auto_monitor or self._auto_initialize != InitData.NONE:
                 cac.flush_io()
-        self._connection_handlers.run(self, connected)
+        if self._user_connection_handler:
+            self._user_connection_handler(self, connected)
 
     def _put_handler(self, succeeded):
         self._put_value.set(succeeded)
@@ -252,75 +221,61 @@ class PV(object):
         self._get_value.set(values)
         with self._data_lock:
             self._data.update(values)
-        self._monitor_handlers.run(self, values)
+        if self._user_monitor_handler:
+            self._user_monitor_handler(self, values)
 
     def _monitor_handler(self, values):
         values = self._decode(values)
         with self._data_lock:
             self._data.update(values)
-        self._monitor_handlers.run(self, values)
+        if self._user_monitor_handler:
+            self._user_monitor_handler(self, values)
 
-    def add_connection_handler(self, handler):
+
+    @property
+    def connection_handler(self):
         """
-        Add a connection handler.
+        The connection handler.
 
-        The connection handlers are called when the connection status
-        of the PV changes.
+        The handler is called when the connection status of the PV changes.
 
-        **Handler**:
-            **Signature**: ``fn(pv, connected)``
+        **Signature**: ``fn(pv, connected)``
 
-            **Parameters**:
+        **Parameters**:
 
-                * **pv** (:class:`PV`): The :class:`PV` object with the
-                  changed connection state.
-                * **connected** (bool): If ``True`` the PV is connected.
-
-
-        Arguments:
-            handler (callable): The connection handler to add.
+            * **pv** (:class:`PV`): The :class:`PV` object with the
+              changed connection state.
+            * **connected** (bool): If ``True`` the PV is connected.
         """
-        self._connection_handlers.add(handler)
+        return self._user_connection_handler
 
-    def remove_connection_handler(self, handler):
+    @connection_handler.setter
+    def connection_handler(self, handler):
+        self._user_connection_handler = handler
+
+
+    @property
+    def monitor_handler(self):
         """
-        Remove a connection handler.
+        The monitor handler.
 
-        Arguments:
-            handler (callable): The same object used in :meth:`add_connection_handler`.
+        The monitor handler is called when a channel access
+        subscription triggers or data is received from a get request.
+
+        **Signature**: ``fn(pv, data)``
+
+        **Parameters**:
+
+            * **pv** (:class:`PV`): The :class:`PV` object with the
+              changed values.
+            * **data** (dict): A data dictionary with the received values.
         """
-        self._connection_handlers.remove(handler)
+        return self._user_monitor_handler
 
-    def add_monitor_handler(self, handler):
-        """
-        Add a monitor handler.
+    @monitor_handler.setter
+    def monitor_handler(self, handler):
+        self._user_monitor_handler = handler
 
-        The monitor handlers are called when a channel access
-        subscription triggers.
-
-        **Handler**:
-            **Signature**: ``fn(pv, values)``
-
-            **Parameters**:
-
-                * **pv** (:class:`PV`): The :class:`PV` object with the
-                  changed values.
-                * **values** (dict): A dictionary with the changed values.
-
-
-        Arguments:
-            handler (callable): The monitor handler to add.
-        """
-        self._monitor_handlers.add(handler)
-
-    def remove_monitor_handler(self, handler):
-        """
-        Remove a monitor handler.
-
-        Arguments:
-            handler (callable): The same object used in :meth:`add_monitor_handler`.
-        """
-        self._monitor_handlers.remove(handler)
 
     def connect(self, block=True):
         """
@@ -366,7 +321,6 @@ class PV(object):
 
         Raises:
             RuntimeError: If the connection could not be etablished.
-
         """
         try:
             connected = self.connected
