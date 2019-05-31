@@ -60,7 +60,7 @@ PyDoc_STRVAR(pend_io__doc__, R"(pend_io(timeout)
 Flush the send buffer and wait for outstandig get requests.
 
 This function flushes the send buffer and then blocks until outstanding
-get() requests complete..
+get requests complete..
 
 Arguments:
     timeout (float): Timeout interval in seconds. 0 means forever.
@@ -172,7 +172,7 @@ PyMethodDef methods[] = {
 };
 
 PyDoc_STRVAR(cac__doc__, R"(
-Low level wrapper module over the libca interface.
+Low level wrapper module over the *libca* interface.
 )");
 PyModuleDef module = {
     PyModuleDef_HEAD_INIT,

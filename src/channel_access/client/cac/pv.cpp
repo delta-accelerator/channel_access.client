@@ -292,7 +292,7 @@ If a subscription was already created it is first removed.
 Arguments:
     events (:class:`Events`): Specifies which events will trigger the subscription.
     count (int): The number of elements to retrieve. If negative the number of elements of the PV is used.
-    control (bool): If ``True`` additional properties (unit, limits, etc.) will be retrieved.
+    control (bool): If ``True`` the control properties (unit, limits, etc.) will be retrieved.
     as_string (bool): If ``True`` ask the server for a string representation instead of the native type.
 )");
 PyObject* subscribe(PyObject* self, PyObject* args)
@@ -438,13 +438,13 @@ PyDoc_STRVAR(get__doc__, R"(get(count, control, as_string)
 
 Request data from the server.
 
-This call does not return the data only put the request in the
+This call does not return the data but only puts the request in the
 send buffer. If the data arrives the :data:`get_handler` is called with
 the data.
 
 Arguments:
     count (int): The number of elements to request. If negative the number of elements of the PV is used.
-    control (bool): If ``True`` additional properties (unit, limits, etc.) will be requested.
+    control (bool): If ``True`` the control properties (unit, limits, etc.) will be requested.
     as_string (bool): If ``True`` ask the server for a string representation instead of the native type.
 )");
 PyObject* get(PyObject* self, PyObject* args)
@@ -609,7 +609,7 @@ PyObject* access(PyObject* self, PyObject*)
 PyDoc_STRVAR(is_connected__doc__, R"(is_connected()
 
 Returns:
-    bool:  ``True`` if the PV is connected.
+    bool: ``True`` if the PV is connected.
 )");
 PyObject* is_connected(PyObject* self, PyObject*)
 {
@@ -710,29 +710,50 @@ This class encapsulates a channel id and forwards the callback functions
 to python.
 
 Some of the API functionality is not implemented:
+
     - Multiple subscriptions
-    - Non callback get and put
+    - Non-callback get and put
     - Synchronous groups
 
-The following keys can occur in a values dictionary. They are equivalent
-to the struct members in the libca API:
+The following keys can occur in a values dictionary:
 
-    * secPastEpoch
-    * nsec
-    * status
-    * severity
-    * precision
-    * units
-    * lower_disp_limit
-    * upper_disp_limit
-    * lower_ctrl_limit
-    * upper_ctrl_limit
-    * lower_warning_limit
-    * upper_warning_limit
-    * lower_alarm_limit
-    * upper_alarm_limit
-    * no_str
-    * strs
+value
+    Data value, type depends on the native type.
+
+status
+    Value status, one of :class:`Status`.
+
+severity
+    Value severity, one of :class:`Severity`.
+
+timestamp
+    An epics timestamp tule ``(seconds, nanoseconds)``. The time is
+    counted from the epics epoch.
+
+enum_strings
+    Tuple with the strings corresponding to the enumeration values.
+
+unit
+    String representing the physical unit of the value.
+
+precision
+    Integer representing the number of relevant decimal places.
+
+display_limits
+    A tuple ``(minimum, maximum)`` representing the range of values
+    for a user interface.
+
+control_limits
+    A tuple ``(minimum, maximum)`` representing the range of values
+    accepted for a put request by the server.
+
+warning_limits
+    A tuple ``(minimum, maximum)``. When the value lies outside of the
+    range of values the status becomes :class:`Status.LOW` or :class:`Status.HIGH`.
+
+alarm_limits
+    A tuple ``(minimum, maximum)``. When the value lies outside of the
+    range of values the status becomes :class:`Status.LOLO` or :class:`Status.HIHI`.
 )");
 
 PyTypeObject pv_type = {
