@@ -42,10 +42,15 @@ cac_extension = Extension('channel_access.client.cac',
 )
 
 
+with open('README.rst', encoding='utf-8') as f:
+    long_description = f.read()
+
+
 setup(
     name = 'channel_access.client',
     description = 'Channel Access client library',
-    long_description = '',
+    long_description = long_description,
+    long_description_content_type='text/x-rst',
     license='MIT',
     author = 'André Althaus',
     author_email = 'andre.althaus@tu-dortmund.de',
@@ -53,18 +58,18 @@ setup(
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering'
     ],
     keywords = 'epics ca channel_access',
     packages = PEP420PackageFinder.find('src'),
     package_dir = { '': 'src' },
     ext_modules = [ cac_extension ],
-    python_requires = '>= 3.4',
+    python_requires = '>= 3.5',
     setup_requires = [ 'setuptools_scm' ],
-    install_requires = [],
+    install_requires = [ 'channel_access.common' ],
     extras_require = {
         'dev': [ 'tox', 'sphinx', 'pytest' ],
         'doc': [ 'sphinx' ],
