@@ -8,12 +8,16 @@ import enum
 
 import channel_access.common as ca
 from . import cac
-from .cac import CaException
 
+
+
+#: Exception raised when an error occurs inside a channel access function.
+CaException = cac.CaException
 
 
 # Can't distinguish between None value and timeout
-class EventData(object):
+class _EventData(object):
+    """ A condition variable with an associated value. """
     def __init__(self, default=None):
         self._cond = threading.Condition()
         self._default = default
@@ -88,19 +92,51 @@ class PV(object):
     When calling methods on many PVs it is faster to use the non-blocking
     versions and at the end call :meth:`Client.flush()`.
 
-    The following keys may occur in the values dictionaries:
+    The following keys can occur in a data dictionary:
 
-        * timestamp
-        * status
-        * severity
-        * value
-        * precision
-        * unit
-        * enum_strings
-        * display_limits
-        * control_limits
-        * warning_limits
-        * alarm_limits
+    value
+        Data value, type depends on the native type. For integer types
+        and enum types this is ``int``, for floating point types this is ``float``.
+        For string types this is ``bytes`` or ``str`` depending on the
+        ``encondig`` parameter.
+
+    status
+        Value status, one of :class:`Status`.
+
+    severity
+        Value severity, one of :class:`Severity`.
+
+    timestamp
+        An aware datetime representing the point in time the value was
+        changed.
+
+    enum_strings
+        Tuple with the strings corresponding to the enumeration values.
+        The entries are ``bytes`` or ``str`` depending on the
+        ``encondig`` parameter.
+
+    unit
+        String representing the physical unit of the value. The type is
+        ``bytes`` or ``str`` depending on the ``encondig`` parameter.
+
+    precision
+        Integer representing the number of relevant decimal places.
+
+    display_limits
+        A tuple ``(minimum, maximum)`` representing the range of values
+        for a user interface.
+
+    control_limits
+        A tuple ``(minimum, maximum)`` representing the range of values
+        accepted for a put request by the server.
+
+    warning_limits
+        A tuple ``(minimum, maximum)``. When the value lies outside of the
+        range of values the status becomes :class:`Status.LOW` or :class:`Status.HIGH`.
+
+    alarm_limits
+        A tuple ``(minimum, maximum)``. When the value lies outside of the
+        range of values the status becomes :class:`Status.LOLO` or :class:`Status.HIHI`.
     """
     def __init__(self, name, connect=True, monitor=True,
                  initialize=InitData.CONTROL, encoding='utf-8'):
@@ -137,9 +173,9 @@ class PV(object):
         self._auto_initialize = initialize
         self._auto_monitor = bool(monitor)
 
-        self._connect_value = EventData(False)
-        self._get_value = EventData()
-        self._put_value = EventData()
+        self._connect_value = _EventData(False)
+        self._get_value = _EventData()
+        self._put_value = _EventData()
         self._subscribed = False
 
         self._data = {}
@@ -690,8 +726,8 @@ class Client(object):
         """
         Flush any outstanding server requests.
 
-        When using the non-blocking methods of the :class:`PV` class, requests
-        are only queued but not necessarily send to the server.
+        When the non-blocking methods of the :class:`PV` class are used,
+        requests are only queued but not necessarily send to the server.
         Calling this funtions flushes the send queue.
 
         Arguments:
@@ -720,6 +756,10 @@ class Client(object):
         Create a new channel access PV.
 
         All arguments are forwarded to the :class:`PV` class.
+
+        The client does not hold a reference to the returned PV so it
+        can be collected if it is no longer used. It is the  responsibility
+        of the user to keep the PV objects alive as long as they are needed.
 
         PV objects are cached. Calling this function multiple times
         with the same name will return the same object if it is not

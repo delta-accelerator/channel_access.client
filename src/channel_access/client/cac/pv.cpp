@@ -718,7 +718,9 @@ Some of the API functionality is not implemented:
 The following keys can occur in a values dictionary:
 
 value
-    Data value, type depends on the native type.
+    Data value, type depends on the native type. For integer types
+    and enum types this is ``int``, for floating point types this is ``float``.
+    For string types this is ``bytes`` because there is no defined encoding.
 
 status
     Value status, one of :class:`Status`.
@@ -732,9 +734,11 @@ timestamp
 
 enum_strings
     Tuple with the strings corresponding to the enumeration values.
+    The entries are ``bytes`` because there is not defined encoding.
 
 unit
-    String representing the physical unit of the value.
+    String representing the physical unit of the value. The type is
+    ``bytes`` because there is not defined encoding.
 
 precision
     Integer representing the number of relevant decimal places.

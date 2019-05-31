@@ -16,6 +16,15 @@ Then the library can be installed with pip::
 
     pip install channel_access.client
 
+Examples
+--------
+Examples are located in the ``examples`` directory.
+
+The ``simple.py`` example monitors a single process value and outputs the
+contents of the data dictionary::
+
+    python examples/simple.py test-pv
+
 Get the source
 --------------
 The source code is available in a `Github repository`_::
@@ -26,13 +35,18 @@ The source code is available in a `Github repository`_::
 
 Documentation
 -------------
-The documentation can be generated from the source code with *sphinx*::
+The documentation for the last version is available `online`_.
+
+The documentation can also be generated from the source code with *sphinx*.
+The package must be installed prior to building the documentation::
 
     cd /path/to/repository
-    pip install -e .
+    pip install .
     python setup.py build_sphinx
 
 Then open ``build/sphinx/html/index.html``.
+
+.. _online: https://delta-accelerator.github.io/channel_access.client
 
 Tests
 -----
