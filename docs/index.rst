@@ -1,11 +1,15 @@
-Channel Access client library
-=============================
-
-
-API Reference
--------------
+Documentation
+=============
 
 .. toctree::
+    :maxdepth: 2
 
-    client.rst
-    client.cac.rst
+    quickstart
+    api
+
+
+Indices and tables
+==================
+
+   * :ref:`genindex`
+   * :ref:`search`
