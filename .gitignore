@@ -1,0 +1,13 @@
+# Python build files
+build/
+tests/
+dist/
+*.egg-info/
+__pycache__/
+*.pyc
+*.log
+*.pdf
+*.so
+.eggs/
+.pytest_cache/
+.tox/
