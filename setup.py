@@ -71,9 +71,9 @@ setup(
     setup_requires = [ 'setuptools_scm' ],
     install_requires = [ 'channel_access.common' ],
     extras_require = {
-        'dev': [ 'tox', 'sphinx', 'pytest' ],
+        'dev': [ 'tox', 'sphinx', 'pytest', 'channel_access.server' ],
         'doc': [ 'sphinx' ],
-        'test': [ 'pytest' ]
+        'test': [ 'pytest', 'channel_access.server' ]
     },
     use_scm_version = True
 )
