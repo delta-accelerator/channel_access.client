@@ -709,7 +709,7 @@ class Client(object):
         """
         for pv in self._pvs.values():
             pv.disconnect()
-        cac.flush_io()
+        cac.pend_event(0.1)
         cac.finalize()
 
     def createPV(self, name, *args, **kwargs):
