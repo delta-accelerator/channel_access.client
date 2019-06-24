@@ -55,7 +55,7 @@ auto put(PyObject* py_value, T* buffer) -> typename std::enable_if<std::is_float
 template<typename T>
 bool put_value(std::vector<uint8_t>& buffer, PyObject* value, long& count)
 {
-    if (count == 1 and not PySequence_Check(value)) {
+    if (count == 1) {
         buffer.resize(sizeof(T));
         auto* buf = reinterpret_cast<T*>(buffer.data());
 

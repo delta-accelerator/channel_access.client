@@ -189,8 +189,12 @@ class PV(object):
             if 'enum_strings' in result:
                 result['enum_strings'] = tuple(x.decode(self._encoding) for x in result['enum_strings'])
 
-            if 'value' in result and isinstance(result['value'], bytes):
-                result['value'] = result['value'].decode(self._encoding)
+            value = result.get('value')
+            if value is not None:
+                if isinstance(value, bytes):
+                    result['value'] = value.decode(self._encoding)
+                elif self.count > 1 and len(value) > 1 and isinstance(value[0], bytes):
+                    result['value'] = tuple( x.decode(self._encoding) for x in value )
 
         if 'timestamp' in result:
             result['timestamp'] = ca.epics_to_datetime(result['timestamp'])
@@ -390,9 +394,12 @@ class PV(object):
             * If ``block > 0.0`` wether the value is changed on the server
               or ``None`` if the timeout occured.
         """
-        if isinstance(value, str):
-            if self._encoding is None:
-                raise TypeError("str value not allowed if no encoding is used")
+        if (isinstance(value, str) or (self.count > 1 and isinstance(value[0], str))) and self._encoding is None:
+            raise TypeError("str value not allowed if no encoding is used")
+
+        if self.count > 1 and isinstance(value[0], str):
+            value = tuple(x.encode(self._encoding) for x in value)
+        elif isinstance(value, str):
             value = value.encode(self._encoding)
         self._pv.put(value)
 

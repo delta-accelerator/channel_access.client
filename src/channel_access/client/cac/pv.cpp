@@ -506,8 +506,16 @@ PyObject* put(PyObject* self, PyObject* arg)
     }
 
     // Allow bytes for enum pvs to be send as string
-    if (type == DBF_ENUM and PyBytes_Check(arg)) {
-        type = DBF_STRING;
+    if (type == DBF_ENUM) {
+      bool use_string = false;
+      if (count == 1) {
+          use_string = PyBytes_Check(arg);
+      } else {
+          PyObject* item = PySequence_GetItem(arg, 0);
+          if (not item) return nullptr;
+          use_string = PyBytes_Check(item);
+      }
+      if (use_string) type = DBF_STRING;
     }
 
     short dbr_type = dbf_type_to_DBR(type);
