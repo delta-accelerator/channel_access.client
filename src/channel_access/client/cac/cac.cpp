@@ -121,6 +121,23 @@ PyObject* pend_event(PyObject*, PyObject* arg)
     Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR(poll__doc__, R"(poll()
+
+Flush the send buffer and process CA background activity.
+)");
+PyObject* poll(PyObject*, PyObject*)
+{
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_poll();
+    Py_END_ALLOW_THREADS
+
+    if (result != ECA_TIMEOUT) {
+        return PyErr_Format(cac::ca_exception, "Could not execute poll: %s", ca_message(result));
+    }
+    Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR(initialize__doc__, R"(initialize(preemptive)
 
 Create a process wide ca context.
@@ -166,6 +183,7 @@ PyMethodDef methods[] = {
     {"pend_io",        pend_io,        METH_O,      pend_io__doc__},
     {"flush_io",       flush_io,       METH_NOARGS, flush_io__doc__},
     {"pend_event",     pend_event,     METH_O,      pend_event__doc__},
+    {"poll",           poll,           METH_NOARGS, poll__doc__},
     {"initialize",     initialize,     METH_O,      initialize__doc__},
     {"finalize",       finalize,       METH_NOARGS, finalize__doc__},
     {nullptr}
