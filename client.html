@@ -1,0 +1,699 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>High-level thread-safe interface &#8212; channel_access.client 0.1.dev17+g8ecdab5 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Low-level libca binding" href="client.cac.html" />
+    <link rel="prev" title="API reference" href="api.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-channel_access.client">
+<span id="high-level-thread-safe-interface"></span><h1>High-level thread-safe interface<a class="headerlink" href="#module-channel_access.client" title="Permalink to this headline">¶</a></h1>
+<p>High level implementation of a channel access client.</p>
+<dl class="exception">
+<dt id="channel_access.client.CaException">
+<em class="property">exception </em><code class="sig-prename descclassname">channel_access.client.</code><code class="sig-name descname">CaException</code><a class="headerlink" href="#channel_access.client.CaException" title="Permalink to this definition">¶</a></dt>
+<dd><p>This exception is raised when a channel access functions returns an error.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="channel_access.client.Client">
+<em class="property">class </em><code class="sig-prename descclassname">channel_access.client.</code><code class="sig-name descname">Client</code><a class="headerlink" href="#channel_access.client.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Channel Access client.</p>
+<p>This class manages the process wide channel access context.
+An instance of this class must be created before any PV can be created.
+It must also be <a class="reference internal" href="#channel_access.client.Client.shutdown" title="channel_access.client.Client.shutdown"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shutdown()</span></code></a> before the process ends.</p>
+<p>It implements the context manager interface which makes it possible
+to use a with-statement to guarantee shutdown.</p>
+<p>A preemptive context is used so no polling functions have to be called.
+Depending on the use case <a class="reference internal" href="#channel_access.client.Client.flush" title="channel_access.client.Client.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flush()</span></code></a> has to be called.</p>
+<dl class="method">
+<dt id="channel_access.client.Client.createPV">
+<code class="sig-name descname">createPV</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.Client.createPV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new channel access PV.</p>
+<p>All arguments are forwarded to the <a class="reference internal" href="#channel_access.client.PV" title="channel_access.client.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a> class.</p>
+<p>The client does not hold a reference to the returned PV so it
+can be collected if it is no longer used. It is the  responsibility
+of the user to keep the PV objects alive as long as they are needed.</p>
+<p>PV objects are cached. Calling this function multiple times
+with the same name will return the same object if it is not
+garbage collected between the calls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A new PV object.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#channel_access.client.PV" title="channel_access.client.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.Client.flush">
+<code class="sig-name descname">flush</code><span class="sig-paren">(</span><em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.Client.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flush any outstanding server requests.</p>
+<p>When the non-blocking methods of the <a class="reference internal" href="#channel_access.client.PV" title="channel_access.client.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a> class are used,
+requests are only queued but not necessarily send to the server.
+Calling this funtions flushes the send queue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>timeout</strong> (<em>float</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> don’t block, otherwise block
+for <code class="docutils literal notranslate"><span class="pre">timeout</span></code> seconds.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.Client.shutdown">
+<code class="sig-name descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.Client.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shutdown the channel access client.</p>
+<p>Destroy the process wide channel access context and
+disconnect all active PV objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="channel_access.client.InitData">
+<em class="property">class </em><code class="sig-prename descclassname">channel_access.client.</code><code class="sig-name descname">InitData</code><a class="headerlink" href="#channel_access.client.InitData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data to initialize when a PV connects.</p>
+<dl class="attribute">
+<dt id="channel_access.client.InitData.CONTROL">
+<code class="sig-name descname">CONTROL</code><em class="property"> = 2</em><a class="headerlink" href="#channel_access.client.InitData.CONTROL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="channel_access.client.InitData.DATA">
+<code class="sig-name descname">DATA</code><em class="property"> = 1</em><a class="headerlink" href="#channel_access.client.InitData.DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="channel_access.client.InitData.NONE">
+<code class="sig-name descname">NONE</code><em class="property"> = 0</em><a class="headerlink" href="#channel_access.client.InitData.NONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="channel_access.client.PV">
+<em class="property">class </em><code class="sig-prename descclassname">channel_access.client.</code><code class="sig-name descname">PV</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">connect=True</em>, <em class="sig-param">monitor=True</em>, <em class="sig-param">initialize=&lt;InitData.CONTROL: 2&gt;</em>, <em class="sig-param">encoding='utf-8'</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV" title="Permalink to this definition">¶</a></dt>
+<dd><p>A channel access PV.</p>
+<p>This class gives thread-safe access to a channel access PV.</p>
+<p>It implements the context manager interface which makes it possible
+to use a with-statement to guarantee disconnect.</p>
+<p>The default parameters are such that methods will block until the
+request is fullfilled and then return the result.</p>
+<p>When calling methods on many PVs it is faster to use the non-blocking
+versions and at the end call <a class="reference internal" href="#channel_access.client.Client.flush" title="channel_access.client.Client.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Client.flush()</span></code></a>.</p>
+<p>The following keys can occur in a data dictionary:</p>
+<dl class="simple">
+<dt>value</dt><dd><p>Data value, type depends on the native type. For integer types
+and enum types this is <code class="docutils literal notranslate"><span class="pre">int</span></code>, for floating point types this is <code class="docutils literal notranslate"><span class="pre">float</span></code>.
+For string types this is <code class="docutils literal notranslate"><span class="pre">bytes</span></code> or <code class="docutils literal notranslate"><span class="pre">str</span></code> depending on the
+<code class="docutils literal notranslate"><span class="pre">encondig</span></code> parameter.</p>
+</dd>
+<dt>status</dt><dd><p>Value status, one of <code class="xref py py-class docutils literal notranslate"><span class="pre">Status</span></code>.</p>
+</dd>
+<dt>severity</dt><dd><p>Value severity, one of <code class="xref py py-class docutils literal notranslate"><span class="pre">Severity</span></code>.</p>
+</dd>
+<dt>timestamp</dt><dd><p>An aware datetime representing the point in time the value was
+changed.</p>
+</dd>
+<dt>enum_strings</dt><dd><p>Tuple with the strings corresponding to the enumeration values.
+The entries are <code class="docutils literal notranslate"><span class="pre">bytes</span></code> or <code class="docutils literal notranslate"><span class="pre">str</span></code> depending on the
+<code class="docutils literal notranslate"><span class="pre">encondig</span></code> parameter.</p>
+</dd>
+<dt>unit</dt><dd><p>String representing the physical unit of the value. The type is
+<code class="docutils literal notranslate"><span class="pre">bytes</span></code> or <code class="docutils literal notranslate"><span class="pre">str</span></code> depending on the <code class="docutils literal notranslate"><span class="pre">encondig</span></code> parameter.</p>
+</dd>
+<dt>precision</dt><dd><p>Integer representing the number of relevant decimal places.</p>
+</dd>
+<dt>display_limits</dt><dd><p>A tuple <code class="docutils literal notranslate"><span class="pre">(minimum,</span> <span class="pre">maximum)</span></code> representing the range of values
+for a user interface.</p>
+</dd>
+<dt>control_limits</dt><dd><p>A tuple <code class="docutils literal notranslate"><span class="pre">(minimum,</span> <span class="pre">maximum)</span></code> representing the range of values
+accepted for a put request by the server.</p>
+</dd>
+<dt>warning_limits</dt><dd><p>A tuple <code class="docutils literal notranslate"><span class="pre">(minimum,</span> <span class="pre">maximum)</span></code>. When the value lies outside of the
+range of values the status becomes <code class="xref py py-class docutils literal notranslate"><span class="pre">Status.LOW</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Status.HIGH</span></code>.</p>
+</dd>
+<dt>alarm_limits</dt><dd><p>A tuple <code class="docutils literal notranslate"><span class="pre">(minimum,</span> <span class="pre">maximum)</span></code>. When the value lies outside of the
+range of values the status becomes <code class="xref py py-class docutils literal notranslate"><span class="pre">Status.LOLO</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Status.HIHI</span></code>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of the remote PV.</p></li>
+<li><p><strong>connect</strong> (<em>bool|callable</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> automatically call <code class="docutils literal notranslate"><span class="pre">connect(block=False)</span></code> after creating the PV.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> <a class="reference internal" href="#channel_access.client.PV.connect" title="channel_access.client.PV.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> must be called to use
+any channel access methods.</p>
+<p>If this is a callable, set it as the connection handler and
+automatically call <code class="docutils literal notranslate"><span class="pre">connect(block=False)</span></code> after creating the PV.</p>
+</p></li>
+<li><p><strong>monitor</strong> (<em>bool|callable</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> automatically subscribe after <a class="reference internal" href="#channel_access.client.PV.connect" title="channel_access.client.PV.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> is called.</p>
+<p>If this is a callable, set it as the monitor handler and
+automatically subscribe after <a class="reference internal" href="#channel_access.client.PV.connect" title="channel_access.client.PV.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> is called.</p>
+</p></li>
+<li><p><strong>initialize</strong> (<a class="reference internal" href="#channel_access.client.InitData" title="channel_access.client.InitData"><code class="xref py py-class docutils literal notranslate"><span class="pre">InitData</span></code></a>) – <p>If <code class="docutils literal notranslate"><span class="pre">InitData.DATA</span></code> automatically call <code class="docutils literal notranslate"><span class="pre">get(block=False)</span></code>
+after a connection is etablished.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">InitData.CONTROL</span></code> automatically call <code class="docutils literal notranslate"><span class="pre">get(block=False,</span> <span class="pre">control=True)</span></code>
+after a connection is etablished.</p>
+<p>This automatically initializes the PV data with the remote values
+as soon as a connection is etablished.</p>
+</p></li>
+<li><p><strong>encoding</strong> (<em>str</em>) – <p>The string encoding used for units, enum strings and string values.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code> these values are <code class="docutils literal notranslate"><span class="pre">bytes</span></code> instead of <code class="docutils literal notranslate"><span class="pre">str</span></code> objects.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="channel_access.client.PV.access_rights">
+<em class="property">property </em><code class="sig-name descname">access_rights</code><a class="headerlink" href="#channel_access.client.PV.access_rights" title="Permalink to this definition">¶</a></dt>
+<dd><p>The access rights to this PV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessRights</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.alarm_limits">
+<em class="property">property </em><code class="sig-name descname">alarm_limits</code><a class="headerlink" href="#channel_access.client.PV.alarm_limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The alarm display limits or <code class="docutils literal notranslate"><span class="pre">None</span></code> if they are unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>tuple(float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.connect">
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the channel and try to connect to it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>block</strong> (<em>bool|float</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> block until a connection is etablished.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> the method returns immediatly.</p>
+<p>If this is a float, block for at most <code class="docutils literal notranslate"><span class="pre">block</span></code> seconds
+and return wether the connection is etablished or not.</p>
+</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">False</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">&gt;</span> <span class="pre">0.0</span></code> wether the connection is etablished.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.connected">
+<em class="property">property </em><code class="sig-name descname">connected</code><a class="headerlink" href="#channel_access.client.PV.connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wether this PV is connected or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.connection_handler">
+<em class="property">property </em><code class="sig-name descname">connection_handler</code><a class="headerlink" href="#channel_access.client.PV.connection_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>The connection handler.</p>
+<p>The handler is called when the connection status of the PV changes.</p>
+<p><strong>Signature</strong>: <code class="docutils literal notranslate"><span class="pre">fn(pv,</span> <span class="pre">connected)</span></code></p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>pv</strong> (<a class="reference internal" href="#channel_access.client.PV" title="channel_access.client.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a>): The <a class="reference internal" href="#channel_access.client.PV" title="channel_access.client.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a> object with the
+changed connection state.</p></li>
+<li><p><strong>connected</strong> (bool): If <code class="docutils literal notranslate"><span class="pre">True</span></code> the PV is connected.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.control_limits">
+<em class="property">property </em><code class="sig-name descname">control_limits</code><a class="headerlink" href="#channel_access.client.PV.control_limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The control display limits or <code class="docutils literal notranslate"><span class="pre">None</span></code> if they are unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>tuple(float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.count">
+<em class="property">property </em><code class="sig-name descname">count</code><a class="headerlink" href="#channel_access.client.PV.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of elements of this PV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#channel_access.client.PV.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary with the current values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.disconnect">
+<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroy the channel.</p>
+<p>This also removes any active subscriptions. After this method is
+called no other channel access methods can be called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.display_limits">
+<em class="property">property </em><code class="sig-name descname">display_limits</code><a class="headerlink" href="#channel_access.client.PV.display_limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current display limits or <code class="docutils literal notranslate"><span class="pre">None</span></code> if they are unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>tuple(float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.ensure_connected">
+<code class="sig-name descname">ensure_connected</code><span class="sig-paren">(</span><em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.ensure_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that a connection is etablished.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>timeout</strong> (<em>None|float</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code> block until a connection is etablished.</p>
+<p>If this is a float wait at most for <code class="docutils literal notranslate"><span class="pre">timeout</span></code> seconds.</p>
+</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If the connection could not be etablished.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.enum_strings">
+<em class="property">property </em><code class="sig-name descname">enum_strings</code><a class="headerlink" href="#channel_access.client.PV.enum_strings" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current enumeration strings or <code class="docutils literal notranslate"><span class="pre">None</span></code> if it’s unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>tuple(str|bytes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">block=True</em>, <em class="sig-param">count=None</em>, <em class="sig-param">control=False</em>, <em class="sig-param">as_string=False</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a value from the server.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">False</span></code> a request is only queued. <a class="reference internal" href="#channel_access.client.Client.flush" title="channel_access.client.Client.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Client.flush()</span></code></a>
+must be called to ensure it is send to the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> (<em>bool|float</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> block until the value arrived from the server.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> the method returns immediatly.</p>
+<p>If this is a float, block for at most <code class="docutils literal notranslate"><span class="pre">block</span></code> seconds
+and return the value or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout occured.</p>
+</p></li>
+<li><p><strong>count</strong> (<em>None|int</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> use the element count of this PV. Otherwise
+request <code class="docutils literal notranslate"><span class="pre">count</span></code> elements from the server.</p></li>
+<li><p><strong>control</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> request control values
+(precision, unit, limits, etc.) from the server.</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> request values as formatted strings from the server.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">False</span></code>.</p></li>
+<li><p>The value if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">&gt;</span> <span class="pre">0.0</span></code> the value or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout occured.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.get_enum_strings">
+<code class="sig-name descname">get_enum_strings</code><span class="sig-paren">(</span><em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.get_enum_strings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the tuple of enumeration strings form the server.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">False</span></code> a request is only queued. <a class="reference internal" href="#channel_access.client.Client.flush" title="channel_access.client.Client.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Client.flush()</span></code></a>
+must be called to ensure it is send to the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>block</strong> (<em>bool|float</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> block until the value arrived from the server.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> the method returns immediatly.</p>
+<p>If this is a float, block for at most <code class="docutils literal notranslate"><span class="pre">block</span></code> seconds
+and return the strings or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout occured.</p>
+</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">False</span></code>.</p></li>
+<li><p>The strings if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">&gt;</span> <span class="pre">0.0</span></code> the strings or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout occured.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.host">
+<em class="property">property </em><code class="sig-name descname">host</code><a class="headerlink" href="#channel_access.client.PV.host" title="Permalink to this definition">¶</a></dt>
+<dd><p>The remote host of this PV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.is_enum">
+<em class="property">property </em><code class="sig-name descname">is_enum</code><a class="headerlink" href="#channel_access.client.PV.is_enum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wether this PV is of enumeration type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.monitor_handler">
+<em class="property">property </em><code class="sig-name descname">monitor_handler</code><a class="headerlink" href="#channel_access.client.PV.monitor_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>The monitor handler.</p>
+<p>The monitor handler is called when a channel access
+subscription triggers or data is received from a get request.</p>
+<p><strong>Signature</strong>: <code class="docutils literal notranslate"><span class="pre">fn(pv,</span> <span class="pre">data)</span></code></p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>pv</strong> (<a class="reference internal" href="#channel_access.client.PV" title="channel_access.client.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a>): The <a class="reference internal" href="#channel_access.client.PV" title="channel_access.client.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a> object with the
+changed values.</p></li>
+<li><p><strong>data</strong> (dict): A data dictionary with the received values.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.monitored">
+<em class="property">property </em><code class="sig-name descname">monitored</code><a class="headerlink" href="#channel_access.client.PV.monitored" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wether this PV is monitored by a <a class="reference internal" href="#channel_access.client.PV.subscribe" title="channel_access.client.PV.subscribe"><code class="xref py py-func docutils literal notranslate"><span class="pre">subscribe()</span></code></a> call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#channel_access.client.PV.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of this PV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.precision">
+<em class="property">property </em><code class="sig-name descname">precision</code><a class="headerlink" href="#channel_access.client.PV.precision" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current precision or <code class="docutils literal notranslate"><span class="pre">None</span></code> if it’s unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.put">
+<code class="sig-name descname">put</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a value into the PV.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">False</span></code> a request is only queued. <a class="reference internal" href="#channel_access.client.Client.flush" title="channel_access.client.Client.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Client.flush()</span></code></a>
+must be called to ensure it is send to the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The new value. For array PVs a list must be used.</p></li>
+<li><p><strong>block</strong> (<em>bool|float</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> block until the value is changed on the server.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> the method returns immediatly.</p>
+<p>If this is a float, block for at most <code class="docutils literal notranslate"><span class="pre">block</span></code> seconds
+and return wether the value is changed on the server
+or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout occured.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">False</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">block</span> <span class="pre">&gt;</span> <span class="pre">0.0</span></code> wether the value is changed on the server
+or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout occured.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.severity">
+<em class="property">property </em><code class="sig-name descname">severity</code><a class="headerlink" href="#channel_access.client.PV.severity" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current severity or <code class="docutils literal notranslate"><span class="pre">None</span></code> if it’s unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Severity</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.status">
+<em class="property">property </em><code class="sig-name descname">status</code><a class="headerlink" href="#channel_access.client.PV.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current status or <code class="docutils literal notranslate"><span class="pre">None</span></code> if it’s unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Status</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.subscribe">
+<code class="sig-name descname">subscribe</code><span class="sig-paren">(</span><em class="sig-param">trigger=&lt;Events.ALARM|VALUE: 5&gt;</em>, <em class="sig-param">count=None</em>, <em class="sig-param">control=False</em>, <em class="sig-param">as_string=False</em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a channel access subscription.</p>
+<p>The request for the subscription is only queued. <a class="reference internal" href="#channel_access.client.Client.flush" title="channel_access.client.Client.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Client.flush()</span></code></a>
+must be called to ensure it is send to the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trigger</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Trigger</span></code>) – The trigger sources for this subscription. See <code class="xref py py-class docutils literal notranslate"><span class="pre">Trigger</span></code>.</p></li>
+<li><p><strong>count</strong> (<em>None|int</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> use the element count of this PV. Otherwise
+request <code class="docutils literal notranslate"><span class="pre">count</span></code> elements from the server.</p></li>
+<li><p><strong>control</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> request control values
+(precision, unit, limits, etc.) from the server.</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> request values as formatted strings from the server.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.timestamp">
+<em class="property">property </em><code class="sig-name descname">timestamp</code><a class="headerlink" href="#channel_access.client.PV.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>The timestamp in UTC of the last received data or <code class="docutils literal notranslate"><span class="pre">None</span></code> if it’s unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>datetime</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.type">
+<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#channel_access.client.PV.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The data type of this PV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.unit">
+<em class="property">property </em><code class="sig-name descname">unit</code><a class="headerlink" href="#channel_access.client.PV.unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current unit or <code class="docutils literal notranslate"><span class="pre">None</span></code> if it’s unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str|bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.unsubscribe">
+<code class="sig-name descname">unsubscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.PV.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the channel access subscription.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.valid_value">
+<em class="property">property </em><code class="sig-name descname">valid_value</code><a class="headerlink" href="#channel_access.client.PV.valid_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a valid value or throw an exception.</p>
+<p>This property will only return a value if the pv is connected,
+it’s severity is not INVALID and a value was received before.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#channel_access.client.PV.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current value of the PV or <code class="docutils literal notranslate"><span class="pre">None</span></code> if it’s unknown.</p>
+<p>This is writeable and calls <code class="docutils literal notranslate"><span class="pre">put(value,</span> <span class="pre">block=False)</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="channel_access.client.PV.warning_limits">
+<em class="property">property </em><code class="sig-name descname">warning_limits</code><a class="headerlink" href="#channel_access.client.PV.warning_limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The warning display limits or <code class="docutils literal notranslate"><span class="pre">None</span></code> if they are unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>tuple(float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">channel_access.client</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">High-level thread-safe interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.cac.html">Low-level libca binding</a></li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="genindex.html">Index</a></li>
+    
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="api.html">API reference</a><ul>
+      <li>Previous: <a href="api.html" title="previous chapter">API reference</a></li>
+      <li>Next: <a href="client.cac.html" title="next chapter">Low-level libca binding</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/client.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
