@@ -241,14 +241,20 @@ PyObject* create_channel(PyObject* self, PyObject*)
         return PyErr_Format(cac::ca_exception, "Channel for %s is already created", pv->name);
     }
 
-    int result = ca_create_channel(pv->name, connection_handler, self, capriority, &pv->cid);
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_create_channel(pv->name, connection_handler, self, capriority, &pv->cid);
+    Py_END_ALLOW_THREADS
     if (result != ECA_NORMAL) {
         return PyErr_Format(cac::ca_exception, "Error in ca_create_channel for %s: %s", pv->name, ca_message(result));
     }
 
     // If an access handler was set before the channel was created set it now
     if (pv->access_handler and pv->access_handler != Py_None) {
-        int result = ca_replace_access_rights_event(pv->cid, access_handler);
+        int result;
+        Py_BEGIN_ALLOW_THREADS
+            result = ca_replace_access_rights_event(pv->cid, access_handler);
+        Py_END_ALLOW_THREADS
         if (result != ECA_NORMAL) {
             return PyErr_Format(cac::ca_exception, "Error in ca_replace_access_rights_event for %s: %s", pv->name, ca_message(result));
         }
@@ -328,8 +334,12 @@ PyObject* subscribe(PyObject* self, PyObject* args)
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
 
-    int elem_count = ca_element_count(pv->cid);
-    short type = ca_field_type(pv->cid);
+    int elem_count;
+    short type;
+    Py_BEGIN_ALLOW_THREADS
+        elem_count = ca_element_count(pv->cid);
+        type = ca_field_type(pv->cid);
+    Py_END_ALLOW_THREADS
     if (elem_count == 0 || type == TYPENOTCONN) {
         return PyErr_Format(cac::ca_exception, "Channel for %s is not connected", pv->name);
     }
@@ -344,14 +354,20 @@ PyObject* subscribe(PyObject* self, PyObject* args)
 
     // unsubscribe first if there is already a subscription
     if (pv->eid) {
-        int result = ca_clear_subscription(pv->eid);
+        int result;
+        Py_BEGIN_ALLOW_THREADS
+            result = ca_clear_subscription(pv->eid);
+        Py_END_ALLOW_THREADS
         if (result != ECA_NORMAL) {
             return PyErr_Format(cac::ca_exception, "Error in ca_clear_subscription for %s: %s", pv->name, ca_message(result));
         }
         pv->eid = 0;
     }
 
-    int result = ca_create_subscription(dbr_type, count, pv->cid, event_mask, monitor_handler, pv, &pv->eid);
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_create_subscription(dbr_type, count, pv->cid, event_mask, monitor_handler, pv, &pv->eid);
+    Py_END_ALLOW_THREADS
     if (result != ECA_NORMAL) {
         return PyErr_Format(cac::ca_exception, "Error in ca_create_subscription for %s: %s", pv->name, ca_message(result));
     }
@@ -367,7 +383,10 @@ PyObject* unsubscribe(PyObject* self, PyObject*)
     auto* pv = reinterpret_cast<Pv*>(self);
 
     if (pv->eid) {
-        int result = ca_clear_subscription(pv->eid);
+        int result;
+        Py_BEGIN_ALLOW_THREADS
+            result = ca_clear_subscription(pv->eid);
+        Py_END_ALLOW_THREADS
         if (result != ECA_NORMAL) {
             return PyErr_Format(cac::ca_exception, "Error in ca_clear_subscription for %s: %s", pv->name, ca_message(result));
         }
@@ -393,7 +412,10 @@ PyObject* set_access_handler(PyObject* self, PyObject* arg)
     // if channel is connected also change ca callback
     if (pv->cid) {
         auto handler = arg == Py_None ? nullptr : access_handler;
-        int result = ca_replace_access_rights_event(pv->cid, handler);
+        int result;
+        Py_BEGIN_ALLOW_THREADS
+            result = ca_replace_access_rights_event(pv->cid, handler);
+        Py_END_ALLOW_THREADS
         if (result != ECA_NORMAL) {
             pv->access_handler = old_cb; // revert back to old callback
             Py_DECREF(arg);
@@ -419,7 +441,10 @@ PyObject* get_enum_strings(PyObject* self, PyObject*)
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
 
-    short type = ca_field_type(pv->cid);
+    short type;
+    Py_BEGIN_ALLOW_THREADS
+        type = ca_field_type(pv->cid);
+    Py_END_ALLOW_THREADS
     if (type == TYPENOTCONN) {
         return PyErr_Format(cac::ca_exception, "Channel for %s is not connected", pv->name);
     }
@@ -427,7 +452,10 @@ PyObject* get_enum_strings(PyObject* self, PyObject*)
         return PyErr_Format(cac::ca_exception, "Channel for %s is not of enum type", pv->name);
     }
 
-    int result = ca_array_get_callback(DBR_GR_ENUM, 1, pv->cid, get_handler, pv);
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_array_get_callback(DBR_GR_ENUM, 1, pv->cid, get_handler, pv);
+    Py_END_ALLOW_THREADS
     if (result != ECA_NORMAL) {
         return PyErr_Format(cac::ca_exception, "Error in ca_array_get_callback for %s: %s", pv->name, ca_message(result));
     }
@@ -458,8 +486,12 @@ PyObject* get(PyObject* self, PyObject* args)
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
 
-    int elem_count = ca_element_count(pv->cid);
-    short type = ca_field_type(pv->cid);
+    int elem_count;
+    short type;
+    Py_BEGIN_ALLOW_THREADS
+        elem_count = ca_element_count(pv->cid);
+        type = ca_field_type(pv->cid);
+    Py_END_ALLOW_THREADS
     if (elem_count == 0 || type == TYPENOTCONN) {
         return PyErr_Format(cac::ca_exception, "Channel for %s is not connected", pv->name);
     }
@@ -472,7 +504,10 @@ PyObject* get(PyObject* self, PyObject* args)
     }
     short dbr_type = control ? dbf_type_to_DBR_CTRL(type) : dbf_type_to_DBR_TIME(type);
 
-    int result = ca_array_get_callback(dbr_type, count, pv->cid, get_handler, pv);
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_array_get_callback(dbr_type, count, pv->cid, get_handler, pv);
+    Py_END_ALLOW_THREADS
     if (result != ECA_NORMAL) {
         return PyErr_Format(cac::ca_exception, "Error in ca_array_get_callback for %s: %s", pv->name, ca_message(result));
     }
@@ -499,8 +534,12 @@ PyObject* put(PyObject* self, PyObject* arg)
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
 
-    int count = ca_element_count(pv->cid);
-    short type = ca_field_type(pv->cid);
+    int count;
+    short type;
+    Py_BEGIN_ALLOW_THREADS
+        count = ca_element_count(pv->cid);
+        type = ca_field_type(pv->cid);
+    Py_END_ALLOW_THREADS
     if (count == 0 || type == TYPENOTCONN) {
         return PyErr_Format(cac::ca_exception, "Channel for %s is not connected", pv->name);
     }
@@ -524,7 +563,10 @@ PyObject* put(PyObject* self, PyObject* arg)
 
     // The buffer must stay valid until the callback is called
     PutData* user_data = new PutData{pv, std::move(buffer_result.first)};
-    int result = ca_array_put_callback(dbr_type, buffer_result.second, pv->cid, user_data->buffer.data(), put_handler, user_data);
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_array_put_callback(dbr_type, buffer_result.second, pv->cid, user_data->buffer.data(), put_handler, user_data);
+    Py_END_ALLOW_THREADS
     if (result != ECA_NORMAL) {
         delete user_data;
         return PyErr_Format(cac::ca_exception, "Error in ca_array_put_callback for %s: %s", pv->name, ca_message(result));
@@ -546,7 +588,11 @@ PyObject* host(PyObject* self, PyObject*)
     }
 
     // Interpret as UTF-8. Hopefully this is true.
-    return PyUnicode_FromString(ca_host_name(pv->cid));
+    char const* hostname;
+    Py_BEGIN_ALLOW_THREADS
+        hostname = ca_host_name(pv->cid);
+    Py_END_ALLOW_THREADS
+    return PyUnicode_FromString(hostname);
 }
 
 PyDoc_STRVAR(count__doc__, R"(count()
@@ -561,7 +607,11 @@ PyObject* count(PyObject* self, PyObject*)
     if (not pv->cid) {
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
-    return PyLong_FromLong(ca_element_count(pv->cid));
+    int count;
+    Py_BEGIN_ALLOW_THREADS
+        count = ca_element_count(pv->cid);
+    Py_END_ALLOW_THREADS
+    return PyLong_FromLong(count);
 }
 
 PyDoc_STRVAR(type__doc__, R"(type()
@@ -577,7 +627,10 @@ PyObject* type(PyObject* self, PyObject*)
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
 
-    short type = ca_field_type(pv->cid);
+    short type;
+    Py_BEGIN_ALLOW_THREADS
+        type = ca_field_type(pv->cid);
+    Py_END_ALLOW_THREADS
     if (type == TYPENOTCONN) {
         return PyErr_Format(cac::ca_exception, "Channel for %s is not conntected", pv->name);
     }
@@ -603,8 +656,11 @@ PyObject* access(PyObject* self, PyObject*)
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
 
-    int rw = ca_read_access(pv->cid) ? 1 : 0;
-    rw |= ca_write_access(pv->cid) ? 2 : 0;
+    int rw;
+    Py_BEGIN_ALLOW_THREADS
+        rw = ca_read_access(pv->cid) ? 1 : 0;
+        rw |= ca_write_access(pv->cid) ? 2 : 0;
+    Py_END_ALLOW_THREADS
 
     PyObject* args = Py_BuildValue("(i)", rw);
     if (not args) return nullptr;
@@ -627,7 +683,10 @@ PyObject* is_connected(PyObject* self, PyObject*)
         return PyErr_Format(cac::ca_exception, "No channel created for %s", pv->name);
     }
 
-    auto state = ca_state(pv->cid);
+    channel_state state;
+    Py_BEGIN_ALLOW_THREADS
+        state = ca_state(pv->cid);
+    Py_END_ALLOW_THREADS
 
     PyObject* result = state == cs_conn ? Py_True : Py_False;
     Py_INCREF(result);
@@ -664,7 +723,9 @@ void pv_dealloc(PyObject* self)
     Py_XDECREF(pv->get_handler);
     Py_XDECREF(pv->put_handler);
     if (pv->cid) {
-        ca_clear_channel(pv->cid);
+        Py_BEGIN_ALLOW_THREADS
+            ca_clear_channel(pv->cid);
+        Py_END_ALLOW_THREADS
         pv->cid = 0;
         pv->eid = 0;
     }
