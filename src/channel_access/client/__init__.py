@@ -671,8 +671,15 @@ class Client(object):
     A preemptive context is used so no polling functions have to be called.
     Depending on the use case :meth:`flush` has to be called.
     """
-    def __init__(self):
+    def __init__(self, *, encoding=None):
+        """
+        Args:
+            encoding (str): If not ``None`` this value is used as a
+                default for the ``encoding`` parameter when
+                calling :meth:`createPV`.
+        """
         super().__init__()
+        self._encoding = encoding
         self._pvs = weakref.WeakValueDictionary()
 
         cac.initialize(True)
@@ -731,6 +738,9 @@ class Client(object):
         """
         pv = self._pvs.get(name)
         if pv is None:
+            if 'encoding' not in kwargs and self._encoding is not None:
+                kwargs['encoding'] = self._encoding
+
             pv = PV(name, *args, **kwargs)
             self._pvs[name] = pv
         return pv
