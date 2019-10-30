@@ -578,7 +578,7 @@ class PV(object):
         with self._data_lock:
             value = self._data.get('value')
             severity = self._data.get('severity')
-        if severity == Severity.INVALID:
+        if severity == ca.Severity.INVALID:
             raise RuntimeError("PV value is invalid")
         if value is None:
             raise RuntimeError("PV value is unknown")
