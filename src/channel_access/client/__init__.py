@@ -226,14 +226,14 @@ class PV(object):
         with self._data_lock:
             self._data.update(values)
         if self._user_monitor_handler:
-            self._user_monitor_handler(self, values)
+            self._user_monitor_handler(self, values, True)
 
     def _monitor_handler(self, values):
         values = self._decode(values)
         with self._data_lock:
             self._data.update(values)
         if self._user_monitor_handler:
-            self._user_monitor_handler(self, values)
+            self._user_monitor_handler(self, values, False)
 
 
     @property
@@ -266,13 +266,15 @@ class PV(object):
         The monitor handler is called when a channel access
         subscription triggers or data is received from a get request.
 
-        **Signature**: ``fn(pv, data)``
+        **Signature**: ``fn(pv, data, from_get)``
 
         **Parameters**:
 
             * **pv** (:class:`PV`): The :class:`PV` object with the
               changed values.
             * **data** (dict): A data dictionary with the received values.
+            * **from_get** (bool): ``True`` if the data originated from a get request,
+                                    ``False`` if the data is from a subscription
         """
         return self._user_monitor_handler
 
