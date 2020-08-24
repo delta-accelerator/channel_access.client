@@ -25,6 +25,8 @@ version = '.'.join(release.split('.')[:2])
 
 # -- General configuration ---------------------------------------------------
 
+master_doc = 'index'
+
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon'

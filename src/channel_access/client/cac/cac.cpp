@@ -31,13 +31,20 @@ PyObject* attach_context(PyObject*, PyObject*)
 {
     // only failure modes are if it's already attached or single threaded,
     // so no need to raise an exception
-    if (ca_current_context() == nullptr) {
+    ca_client_context* current_context;
+    Py_BEGIN_ALLOW_THREADS
+        current_context = ca_current_context();
+    Py_END_ALLOW_THREADS
+    if (current_context == nullptr) {
         if (not client_context) {
             PyErr_SetString(cac::ca_exception, "No current ca context. initialize() not called?");
             return nullptr;
         }
 
-        int result = ca_attach_context(client_context);
+        int result;
+        Py_BEGIN_ALLOW_THREADS
+            result = ca_attach_context(client_context);
+        Py_END_ALLOW_THREADS
         if (result != ECA_NORMAL) {
             return PyErr_Format(cac::ca_exception, "Could not attach to ca context: %s", ca_message(result));
         }
@@ -51,7 +58,10 @@ Detach the current thread from the process wide ca context.
 )");
 PyObject* detach_context(PyObject*, PyObject*)
 {
-    ca_detach_context();
+    Py_BEGIN_ALLOW_THREADS
+        ca_detach_context();
+    Py_END_ALLOW_THREADS
+
     Py_RETURN_NONE;
 }
 
@@ -87,7 +97,10 @@ Flush outstanding IO requests to the server.
 )");
 PyObject* flush_io(PyObject*, PyObject*)
 {
-    int result = ca_flush_io();
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_flush_io();
+    Py_END_ALLOW_THREADS
 
     if (result != ECA_NORMAL) {
         return PyErr_Format(cac::ca_exception, "Could not execute flush_io: %s", ca_message(result));
@@ -155,11 +168,16 @@ PyObject* initialize(PyObject* dummy, PyObject* arg)
 
     auto preemptive = PyObject_IsTrue(arg) ? ca_enable_preemptive_callback : ca_disable_preemptive_callback;
 
-    int result = ca_context_create(preemptive);
+    int result;
+    Py_BEGIN_ALLOW_THREADS
+        result = ca_context_create(preemptive);
+    Py_END_ALLOW_THREADS
     if (result != ECA_NORMAL) {
         return PyErr_Format(cac::ca_exception, "Could not create ca context: %s", ca_message(result));
     }
-    client_context = ca_current_context();
+    Py_BEGIN_ALLOW_THREADS
+        client_context = ca_current_context();
+    Py_END_ALLOW_THREADS
     Py_RETURN_NONE;
 }
 
@@ -172,7 +190,9 @@ This should be called to shutdown the channel access library.
 PyObject* finalize(PyObject*, PyObject*)
 {
     client_context = nullptr;
-    ca_context_destroy();
+    Py_BEGIN_ALLOW_THREADS
+        ca_context_destroy();
+    Py_END_ALLOW_THREADS
     Py_RETURN_NONE;
 }
 

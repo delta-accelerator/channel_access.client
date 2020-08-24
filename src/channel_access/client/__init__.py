@@ -226,14 +226,14 @@ class PV(object):
         with self._data_lock:
             self._data.update(values)
         if self._user_monitor_handler:
-            self._user_monitor_handler(self, values)
+            self._user_monitor_handler(self, values, True)
 
     def _monitor_handler(self, values):
         values = self._decode(values)
         with self._data_lock:
             self._data.update(values)
         if self._user_monitor_handler:
-            self._user_monitor_handler(self, values)
+            self._user_monitor_handler(self, values, False)
 
 
     @property
@@ -266,13 +266,15 @@ class PV(object):
         The monitor handler is called when a channel access
         subscription triggers or data is received from a get request.
 
-        **Signature**: ``fn(pv, data)``
+        **Signature**: ``fn(pv, data, from_get)``
 
         **Parameters**:
 
             * **pv** (:class:`PV`): The :class:`PV` object with the
               changed values.
             * **data** (dict): A data dictionary with the received values.
+            * **from_get** (bool): ``True`` if the data originated from a get request,
+                                    ``False`` if the data is from a subscription
         """
         return self._user_monitor_handler
 
@@ -578,7 +580,7 @@ class PV(object):
         with self._data_lock:
             value = self._data.get('value')
             severity = self._data.get('severity')
-        if severity == Severity.INVALID:
+        if severity == ca.Severity.INVALID:
             raise RuntimeError("PV value is invalid")
         if value is None:
             raise RuntimeError("PV value is unknown")
@@ -671,8 +673,15 @@ class Client(object):
     A preemptive context is used so no polling functions have to be called.
     Depending on the use case :meth:`flush` has to be called.
     """
-    def __init__(self):
+    def __init__(self, *, encoding=None):
+        """
+        Args:
+            encoding (str): If not ``None`` this value is used as a
+                default for the ``encoding`` parameter when
+                calling :meth:`createPV`.
+        """
         super().__init__()
+        self._encoding = encoding
         self._pvs = weakref.WeakValueDictionary()
 
         cac.initialize(True)
@@ -731,6 +740,9 @@ class Client(object):
         """
         pv = self._pvs.get(name)
         if pv is None:
+            if 'encoding' not in kwargs and self._encoding is not None:
+                kwargs['encoding'] = self._encoding
+
             pv = PV(name, *args, **kwargs)
             self._pvs[name] = pv
         return pv
