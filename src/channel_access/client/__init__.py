@@ -682,7 +682,7 @@ class Client(object):
         """
         super().__init__()
         self._encoding = encoding
-        self._pvs = weakref.WeakValueDictionary()
+        self._pvs = weakref.WeakSet()
 
         cac.initialize(True)
 
@@ -716,7 +716,7 @@ class Client(object):
         Destroy the process wide channel access context and
         disconnect all active PV objects.
         """
-        for pv in self._pvs.values():
+        for pv in self._pvs:
             pv.disconnect()
         cac.pend_event(0.1)
         cac.finalize()
@@ -731,18 +731,12 @@ class Client(object):
         can be collected if it is no longer used. It is the  responsibility
         of the user to keep the PV objects alive as long as they are needed.
 
-        PV objects are cached. Calling this function multiple times
-        with the same name will return the same object if it is not
-        garbage collected between the calls.
-
         Returns:
             :class:`PV`: A new PV object.
         """
-        pv = self._pvs.get(name)
-        if pv is None:
-            if 'encoding' not in kwargs and self._encoding is not None:
-                kwargs['encoding'] = self._encoding
+        if 'encoding' not in kwargs and self._encoding is not None:
+            kwargs['encoding'] = self._encoding
 
-            pv = PV(name, *args, **kwargs)
-            self._pvs[name] = pv
+        pv = PV(name, *args, **kwargs)
+        self._pvs.add(pv)
         return pv
