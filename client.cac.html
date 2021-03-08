@@ -5,14 +5,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Low-level libca binding &#8212; channel_access.client 0.1.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <title>Low-level libca binding &#8212; channel_access.client 0.1.1.dev9+gb80caf1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="High-level thread-safe interface" href="client.html" />
@@ -37,7 +36,7 @@
 <p>Low level wrapper module over the <em>libca</em> interface.</p>
 <dl class="py class">
 <dt id="channel_access.client.cac.PV">
-<em class="property">class </em><code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">PV</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">PV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new process value with name <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
 <p>This class encapsulates a channel id and forwards the callback functions
 to python.</p>
@@ -85,7 +84,7 @@ range of values the status becomes <code class="xref py py-class docutils litera
 </dl>
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.access">
-<code class="sig-name descname">access</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.access" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">access</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.access" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The access rights.</p>
@@ -98,7 +97,7 @@ range of values the status becomes <code class="xref py py-class docutils litera
 
 <dl class="py attribute">
 <dt id="channel_access.client.cac.PV.access_handler">
-<code class="sig-name descname">access_handler</code><a class="headerlink" href="#channel_access.client.cac.PV.access_handler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">access_handler</span></code><a class="headerlink" href="#channel_access.client.cac.PV.access_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handler called if the access rights change.</p>
 <p><strong>Signature</strong>: <code class="docutils literal notranslate"><span class="pre">fn(access_rights)</span></code></p>
 <dl class="field-list simple">
@@ -110,7 +109,7 @@ range of values the status becomes <code class="xref py py-class docutils litera
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.clear_channel">
-<code class="sig-name descname">clear_channel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.clear_channel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">clear_channel</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.clear_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Destroy the channel of this PV.</p>
 <p>This also removes a subscription. After this function has been called
 no other channel access function can be called.</p>
@@ -118,7 +117,7 @@ no other channel access function can be called.</p>
 
 <dl class="py attribute">
 <dt id="channel_access.client.cac.PV.connection_handler">
-<code class="sig-name descname">connection_handler</code><a class="headerlink" href="#channel_access.client.cac.PV.connection_handler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">connection_handler</span></code><a class="headerlink" href="#channel_access.client.cac.PV.connection_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handler called when the connection state changes.</p>
 <p><strong>Signature</strong>: <code class="docutils literal notranslate"><span class="pre">fn(connected)</span></code></p>
 <dl class="field-list simple">
@@ -130,7 +129,7 @@ no other channel access function can be called.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.count">
-<code class="sig-name descname">count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.count" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">count</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.count" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The number of elements.</p>
@@ -143,7 +142,7 @@ no other channel access function can be called.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.create_channel">
-<code class="sig-name descname">create_channel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.create_channel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">create_channel</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.create_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a channel for this PV.</p>
 <p>This functions must be called  before any other channel access function
 can be called.</p>
@@ -151,7 +150,7 @@ can be called.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">control</span></em>, <em class="sig-param"><span class="n">as_string</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request data from the server.</p>
 <p>This call does not return the data but only puts the request in the
 send buffer. If the data arrives the <a class="reference internal" href="#channel_access.client.cac.PV.get_handler" title="channel_access.client.cac.PV.get_handler"><code class="xref py py-data docutils literal notranslate"><span class="pre">get_handler</span></code></a> is called with
@@ -169,14 +168,14 @@ the data.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.get_enum_strings">
-<code class="sig-name descname">get_enum_strings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.get_enum_strings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_enum_strings</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.get_enum_strings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request the list of enum strings from the server.</p>
 <p>The PV must be of enum type.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="channel_access.client.cac.PV.get_handler">
-<code class="sig-name descname">get_handler</code><a class="headerlink" href="#channel_access.client.cac.PV.get_handler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_handler</span></code><a class="headerlink" href="#channel_access.client.cac.PV.get_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handler called if the data for a get request arrives.</p>
 <p><strong>Signature</strong>: <code class="docutils literal notranslate"><span class="pre">fn(values)</span></code></p>
 <dl class="field-list simple">
@@ -188,7 +187,7 @@ the data.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.host">
-<code class="sig-name descname">host</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.host" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">host</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.host" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The host string of the server.</p>
@@ -201,7 +200,7 @@ the data.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.is_connected">
-<code class="sig-name descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.is_connected" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">is_connected</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the PV is connected.</p>
@@ -214,7 +213,7 @@ the data.</p>
 
 <dl class="py attribute">
 <dt id="channel_access.client.cac.PV.monitor_handler">
-<code class="sig-name descname">monitor_handler</code><a class="headerlink" href="#channel_access.client.cac.PV.monitor_handler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">monitor_handler</span></code><a class="headerlink" href="#channel_access.client.cac.PV.monitor_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handler called when a subscription event is received.</p>
 <p><strong>Signature</strong>: <code class="docutils literal notranslate"><span class="pre">fn(values)</span></code></p>
 <dl class="field-list simple">
@@ -226,13 +225,13 @@ the data.</p>
 
 <dl class="py attribute">
 <dt id="channel_access.client.cac.PV.name">
-<code class="sig-name descname">name</code><a class="headerlink" href="#channel_access.client.cac.PV.name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">name</span></code><a class="headerlink" href="#channel_access.client.cac.PV.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>PV name</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.put">
-<code class="sig-name descname">put</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.put" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">put</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request a value change on the server.</p>
 <p>If this call returns the data is not changed it only puts the request
 for the change in the send buffer.
@@ -247,7 +246,7 @@ with the success status.</p>
 
 <dl class="py attribute">
 <dt id="channel_access.client.cac.PV.put_handler">
-<code class="sig-name descname">put_handler</code><a class="headerlink" href="#channel_access.client.cac.PV.put_handler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">put_handler</span></code><a class="headerlink" href="#channel_access.client.cac.PV.put_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handler called if the status for a put request arrives.</p>
 <p><strong>Signature</strong>: <code class="docutils literal notranslate"><span class="pre">fn(succeeded)</span></code></p>
 <dl class="field-list simple">
@@ -259,14 +258,14 @@ with the success status.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.set_access_handler">
-<code class="sig-name descname">set_access_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">access_handler</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.set_access_handler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_access_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">access_handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.set_access_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change the access rights handler to <a class="reference internal" href="#channel_access.client.cac.PV.access_handler" title="channel_access.client.cac.PV.access_handler"><code class="xref py py-data docutils literal notranslate"><span class="pre">access_handler</span></code></a>.</p>
 <p>If the access rights change the handler is called with the new access rights.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.subscribe">
-<code class="sig-name descname">subscribe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">events</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">control</span></em>, <em class="sig-param"><span class="n">as_string</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.subscribe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">subscribe</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.subscribe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a channel subscription.</p>
 <p>If a subscription was already created it is first removed.</p>
 <dl class="field-list simple">
@@ -283,7 +282,7 @@ with the success status.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.type">
-<code class="sig-name descname">type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">type</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.type" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The native PV type.</p>
@@ -296,7 +295,7 @@ with the success status.</p>
 
 <dl class="py method">
 <dt id="channel_access.client.cac.PV.unsubscribe">
-<code class="sig-name descname">unsubscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">unsubscribe</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.PV.unsubscribe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the subscription.</p>
 </dd></dl>
 
@@ -304,39 +303,39 @@ with the success status.</p>
 
 <dl class="py exception">
 <dt id="channel_access.client.cac.CaException">
-<em class="property">exception </em><code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">CaException</code><a class="headerlink" href="#channel_access.client.cac.CaException" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">CaException</span></code><a class="headerlink" href="#channel_access.client.cac.CaException" title="Permalink to this definition">¶</a></dt>
 <dd><p>This exception is raised when a channel access functions returns an error.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.attach_context">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">attach_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.attach_context" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">attach_context</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.attach_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attach the current thread to the process wide ca context.</p>
 <p>This must be called by all non-main threads who will use the channel access library.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.detach_context">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">detach_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.detach_context" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">detach_context</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.detach_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Detach the current thread from the process wide ca context.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.finalize">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">finalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.finalize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">finalize</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.finalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Destroy the process wide ca context.</p>
 <p>This should be called to shutdown the channel access library.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.flush_io">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">flush_io</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.flush_io" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">flush_io</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.flush_io" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flush outstanding IO requests to the server.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.initialize">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">preemptive</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.initialize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preemptive</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.initialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a process wide ca context.</p>
 <p>This must be called by the main thread to initialize the channel access library.</p>
 <dl class="field-list simple">
@@ -348,7 +347,7 @@ with the success status.</p>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.pend_event">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">pend_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeout</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.pend_event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">pend_event</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.pend_event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flush the send buffer and process CA background activity.</p>
 <p>This function flushes the send buffer and then blocks for <code class="docutils literal notranslate"><span class="pre">timeout</span></code>
 seconds processing CA background activity.</p>
@@ -361,7 +360,7 @@ seconds processing CA background activity.</p>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.pend_io">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">pend_io</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeout</span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.pend_io" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">pend_io</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.pend_io" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flush the send buffer and wait for outstandig get requests.</p>
 <p>This function flushes the send buffer and then blocks until outstanding
 get requests complete..</p>
@@ -374,7 +373,7 @@ get requests complete..</p>
 
 <dl class="py function">
 <dt id="channel_access.client.cac.poll">
-<code class="sig-prename descclassname">channel_access.client.cac.</code><code class="sig-name descname">poll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.poll" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">channel_access.client.cac.</span></code><code class="sig-name descname"><span class="pre">poll</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#channel_access.client.cac.poll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flush the send buffer and process CA background activity.</p>
 </dd></dl>
 
@@ -449,7 +448,7 @@ get requests complete..</p>
       
       
       
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
