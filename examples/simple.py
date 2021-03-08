@@ -6,7 +6,7 @@ import channel_access.client as cac
 
 
 
-def callback(pv, data):
+def callback(pv, data, from_get):
     # ``data`` is a data dictionary with the received values. It does
     # not contain all values, e.g. in this example the first callback
     # receives the control values but the following callbacks only
