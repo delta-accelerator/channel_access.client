@@ -81,7 +81,9 @@ bool put_value(std::vector<uint8_t>& buffer, PyObject* value, long& count)
         PyObject* val = PySequence_GetItem(value, i);
         if (not val) return false;
 
-        if (not put(val, buf + i)) return false;
+        bool result = put(val, buf + i);
+        Py_DECREF(val);
+        if (not result) return false;
     }
     return true;
 }
