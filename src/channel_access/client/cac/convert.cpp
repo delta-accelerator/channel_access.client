@@ -108,6 +108,12 @@ PyObject* get_status(dbr_short_t const value)
 
     PyObject* result = PyObject_Call(cac::enum_status, args, nullptr);
     Py_DECREF(args);
+
+    if (not result) {
+        PyErr_Clear();
+        Py_INCREF(Py_None);
+        result = Py_None;
+    }
     return result;
 }
 
@@ -118,6 +124,12 @@ PyObject* get_severity(dbr_short_t const value)
 
     PyObject* result = PyObject_Call(cac::enum_severity, args, nullptr);
     Py_DECREF(args);
+
+    if (not result) {
+        PyErr_Clear();
+        Py_INCREF(Py_None);
+        result = Py_None;
+    }
     return result;
 }
 
