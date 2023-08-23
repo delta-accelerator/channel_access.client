@@ -29,12 +29,11 @@ class _EventData(object):
             self._cond.notify()
 
     def get(self, timeout=None):
-        result = None
+        result = self._default
         with self._cond:
-            if self._value is None:
-                self._cond.wait(timeout)
-            result = self._value
-            self._value = None
+            if self._value is not None or self._cond.wait(timeout):
+                result = self._value
+                self._value = None
         return result
 
 
