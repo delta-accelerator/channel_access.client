@@ -152,10 +152,20 @@ class PV(object):
         self._user_monitor_handler = None
 
         self._pv = cac.PV(name)
-        self._pv.connection_handler = self._connection_handler
-        self._pv.put_handler = self._put_handler
-        self._pv.get_handler = self._get_handler
-        self._pv.monitor_handler = self._monitor_handler
+
+        # We need weak references to break the reference cycle for the callbacks,
+        # allowing garbage collection of the PV instance.
+        self_ref = weakref.ref(self)
+        def _callback(cb):
+            def fn(*args, **kwargs):
+                self = self_ref()
+                if self is not None:
+                    return cb(self, *args, **kwargs)
+            return fn
+        self._pv.connection_handler = _callback(PV._connection_handler)
+        self._pv.put_handler = _callback(PV._put_handler)
+        self._pv.get_handler = _callback(PV._get_handler)
+        self._pv.monitor_handler = _callback(PV._monitor_handler)
 
         if connect and not isinstance(connect, bool):
             self._user_connection_handler = connect
